@@ -61,12 +61,11 @@ class Readable {
 	skillid() {
 		const raw = this.uint64(),
 			type = Number(raw >> 28n & 0xfn),
-			npc = Boolean(raw & 0x0100000000n),
-			hasHuntingZone = npc && type === 1
+			npc = Boolean(raw & 0x0100000000n)
 
 		return new SkillID({
-			id: Number(raw & (hasHuntingZone ? 0xffffn : 0xfffffffn)),
-			huntingZoneId: hasHuntingZone ? Number(raw >> 16n & 0xfffn) : 0,
+			id: Number(raw & (npc ? 0xffffn : 0xfffffffn)),
+			huntingZoneId: npc ? Number(raw >> 16n & 0xfffn) : 0,
 			type,
 			npc,
 			reserved: Number(raw >> 33n)
@@ -133,10 +132,8 @@ class Writeable {
 	skillid(obj = {}) {
 		if(typeof obj === 'number') obj = {type: 1, id: obj}
 
-		const hasHuntingZone = Boolean(obj.npc) && obj.type == 1
-
-		let raw = BigInt((Number(obj.id) || 0) & (hasHuntingZone ? 0xffff : 0xfffffff))
-		if(hasHuntingZone) raw |= BigInt(obj.huntingZoneId & 0xfff) << 16n
+		let raw = BigInt((Number(obj.id) || 0) & (obj.npc ? 0xffff : 0xfffffff))
+		if(obj.npc) raw |= BigInt(obj.huntingZoneId & 0xfff) << 16n
 		raw |= BigInt(obj.type & 0xf) << 28n
 		raw |= BigInt(obj.npc & 1) << 32n
 		raw |= BigInt(obj.reserved & 1) << 33n

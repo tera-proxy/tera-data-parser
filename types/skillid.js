@@ -5,15 +5,14 @@ function parseArgs(obj) {
 	else if(obj == null) obj = {}
 
 	const npc = Boolean(obj.npc),
-		type = obj.type & 0xf,
-		hasHuntingZone = npc && type === 1
+		type = obj.type & 0xf
 
 	return {
 		reserved: obj.reserved & 0x7fffffff,
 		npc,
 		type,
-		huntingZoneId: hasHuntingZone ? obj.huntingZoneId & 0xfff : 0,
-		id: obj.id & (hasHuntingZone ? 0xffff : 0xfffffff)
+		huntingZoneId: npc ? obj.huntingZoneId & 0xfff : 0,
+		id: obj.id & (npc ? 0xffff : 0xfffffff)
 	}
 }
 
