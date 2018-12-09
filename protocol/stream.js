@@ -1,6 +1,6 @@
 'use strict'
 
-const { SkillID, Vec3 } = require('../types'),
+const { Customize, SkillID, Vec3 } = require('../types'),
 	log = require('../logger')
 
 const MULT_INT16_TO_RAD = 1 / 0x8000 * Math.PI,
@@ -72,6 +72,8 @@ class Readable {
 		})
 	}
 
+	customize() { return new Customize(this.uint64()) }
+
 	float() {
 		const ret = this.buffer.readFloatLE(this.position)
 		this.position += 4
@@ -139,6 +141,18 @@ class Writeable {
 		raw |= BigInt(obj.reserved & 1) << 33n
 
 		this.uint64(raw)
+	}
+
+	customize(val) {
+		if(typeof val === 'object') {
+			if(!(val instanceof Customize)) val = new Customize(val)
+			val.write(this)
+		}
+		else if(typeof val === 'bigint') {
+			val = new Customize(val)
+			val.write(this)
+		}
+		else this.uint64(0)
 	}
 
 	float(n = 0) { this.position = this.buffer.writeFloatLE(n, this.position) }
