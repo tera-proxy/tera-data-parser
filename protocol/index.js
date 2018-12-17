@@ -262,7 +262,7 @@ class TeraProtocol {
 			messages.get(name).set(version, definition)
 
 			if (!mappedMessages.has(name)) {
-				log.warn(`[protocol] load - unmapped message "${name}"`)
+				log.debug(`[protocol] load - unmapped message "${name}"`)
 			}
 		}
 
